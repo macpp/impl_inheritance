@@ -6,6 +6,7 @@ version = "0.0.1"
 authors = ["Maciej Pokorski"]
 edition = "2018"
 license="MIT"
+description = "experimental & work in progress"
 
 [dependencies]
 quote = "0.6"
