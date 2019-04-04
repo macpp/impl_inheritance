@@ -1,0 +1,12 @@
+[lib]
+proc-macro=true
+[package]
+name = "impl_inheritance_macros"
+version = "0.0.1"
+authors = ["Maciej Pokorski"]
+edition = "2018"
+
+[dependencies]
+quote = "0.6"
+proc-macro2 = {version= "0.4"}
+syn = {version = "0.15", features = ["full"]}
