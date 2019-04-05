@@ -3,7 +3,7 @@ proc-macro=true
 [package]
 name = "impl_inheritance_macros"
 version = "0.0.1"
-authors = ["Maciej Pokorski"]
+authors = ["macpp"]
 edition = "2018"
 license="MIT"
 description = "experimental & work in progress"
