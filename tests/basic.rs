@@ -4,35 +4,39 @@
 extern crate impl_inheritance;
 
 #[test]
-pub fn mod_main(){
-    //use inherit::SuperBorrow;
-    println!("ch1");
+fn child1(){
     let ch1 = Child1Data::default();
     assert_eq!(ch1.foo(),0);
+}
 
-    //let _y : & BaseData = ch1.super_ref();
-
-    println!("ch2");
+#[test]
+fn child2(){
     let ch2 = Child2Data::default();
     assert_eq!(ch2.foo(),2);
     ch2.foo1();
     assert_eq!(ch2.foo2(),2002);
+}
 
-    println!("ch3a");
+#[test]
+fn child3a(){
     let ch3a = Child3aData::default();
     assert_eq!(ch3a.foo(),2);
     ch3a.foo1();
     assert_eq!(ch3a.foo2(),2002);
     ch3a.foo3a();
+}
 
-    println!("ch3b");
+#[test]
+fn child3b(){
     let ch3b = Child3bData::default();
     assert_eq!(ch3b.foo(),2);
     ch3b.foo1();
     assert_eq!(ch3b.foo2(),2003);
     ch3b.foo3b();
+}
 
-    println!("ch4");
+#[test]
+fn child4(){
     let mut ch4 = Child4Data::default();
     assert_eq!(ch4.foo(),4);
     ch4.foo1();
@@ -41,8 +45,10 @@ pub fn mod_main(){
     assert_eq!(ch4.foo4(),2);
     assert_eq!(ch4.foo4(),6);
     assert_eq!(ch4.foo4(),14);
+}
 
-    println!("ch5");
+#[test]
+fn child5(){
     let mut ch5 = Child5Data::default();
     assert_eq!(ch5.foo(),4);
     ch5.foo1();
@@ -66,7 +72,6 @@ struct BaseData {
 
 impl Base for BaseData {
     fn foo(&self) -> i32 {
-         println!("foo BaseData: {}", self.x);
          0
     }
 }
@@ -108,7 +113,6 @@ struct Child2Data {
 
 impl Child2 for Child2Data {
     fn foo2(&self) -> i32 {
-        println!("foo2 Child2Data: {}", self.x2);
         2002
     }
 }
@@ -118,7 +122,6 @@ impl Child2 for Child2Data {
 #[overrides]
 impl Base for Child2Data {
     fn foo(&self) -> i32 {
-         println!("foo Child2Data!!!!!!!!!");
          2
     }
 }
@@ -169,7 +172,6 @@ impl Child3b for Child3bData {
 #[overrides]
 impl Child2 for Child3bData {
     fn foo2(&self) -> i32 {
-        println!("foo2 Child3Data: {}%%%", self.x3);
         2003
     }
 }
@@ -193,7 +195,6 @@ impl Child4 for Child4Data {
     fn foo4(& mut self) -> i32 {
         self.x4 += 1;
         self.x4 *=2;
-        println!("foo4 Child4Data: {}", self.x4);
         self.x4
     }
 }
@@ -201,7 +202,6 @@ impl Child4 for Child4Data {
 #[overrides]
 impl Base for Child4Data {
     fn foo(&self) -> i32 {
-         println!("foo Child4Data!!!!!!!!!%%%%%%%%%%%%%");
          4
     }
 }
