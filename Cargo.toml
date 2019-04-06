@@ -7,5 +7,5 @@ license="MIT"
 description = "experimental & work in progress"
 
 [dependencies]
-#impl_inheritance_macros = {path="impl_inheritance_macros"}
-impl_inheritance_macros = "0.0.2"
+impl_inheritance_macros = {path="impl_inheritance_macros"}
+#impl_inheritance_macros = "0.0.2"

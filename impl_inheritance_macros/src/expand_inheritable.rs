@@ -1,6 +1,7 @@
 
 use proc_macro2::TokenStream as TokenStream2;
-use proc_macro2::{Ident,Span};
+use proc_macro2::{Ident};
+use crate::common::*;
 
 use syn::{ItemTrait,punctuated::Punctuated,FnArg,token::Comma};
 
@@ -18,7 +19,6 @@ pub (crate) fn extract_ident(attr: TokenStream2) -> Option<Ident> {
 pub(crate)fn expand(trait_item: ItemTrait, struct_ident: Ident) -> TokenStream2 {
     //TODO: generics
     //TODO: generate documentation
-    let mut impl_items = TokenStream2::new();
 
     let trait_ident = &trait_item.ident;
 
@@ -38,8 +38,8 @@ pub(crate)fn expand(trait_item: ItemTrait, struct_ident: Ident) -> TokenStream2 
             _ =>  panic!("traits with more than one supertrait are not supported")
         }
     };
-
-    for item in trait_item.items.iter() {
+    
+    let impl_items = trait_item.items.iter(). map( |item| {
         use syn::TraitItem;
         match item {
             TraitItem::Method(data) => {
@@ -49,52 +49,45 @@ pub(crate)fn expand(trait_item: ItemTrait, struct_ident: Ident) -> TokenStream2 
                 let inputs = &data.sig.decl.inputs;
                 let return_type = &data.sig.decl.output;
 
-                use syn::FnArg::*;
-                let super_method : Ident = match inputs.iter().next(){
-                    None => panic!("trait with no methods are not supported"),
-                    Some(SelfRef(x)) => {
-                            if x.mutability.is_some() 
-                            {
-                                Ident::new("super_ref_mut", Span::call_site())
-                            } 
-                            else 
-                            {
-                                Ident::new("super_ref", Span::call_site())
-                            }
-                        },
-                    Some(SelfValue(_x)) => panic!("methods with `self` by value are not yet supported"),//Ident::new("super_value", Span::call_site()),
-                    _ => panic!("methods in trait with no self are not supported!")
-                };
+                if let Some((super_method, _)) = get_super_method(inputs.iter().next()) {
 
-                let mut unpacked_inputs = crate::unpack_fn_arg(inputs).into_iter();
-                unpacked_inputs.next();
-                let unpacked_inputs : Punctuated<FnArg, Comma> = unpacked_inputs.collect();
+                    let mut unpacked_inputs = unpack_fn_arg(inputs).into_iter();
+                    unpacked_inputs.next();
+                    let unpacked_inputs : Punctuated<FnArg, Comma> = unpacked_inputs.collect();
 
-                //TODO: support super_value
-                //TODO: consider option for non including `default` by default, but by option
-                impl_items.extend(quote!{
-                    default fn #ident(#inputs) #return_type {
-                        self.#super_method().#ident(#unpacked_inputs)
+                    //TODO: support super_value
+                    //TODO: consider option for non including `default` by default, but by option
+                    quote!{
+                        default fn #ident(#inputs) #return_type {
+                            self.#super_method().#ident(#unpacked_inputs)
+                        }
                     }
-                });
+                } else {
+                    let unpacked_inputs = unpack_fn_arg(inputs);
+                    quote!{
+                        default fn #ident(#inputs) #return_type{
+                           <#struct_ident as #trait_ident> :: #ident(#unpacked_inputs)
+                        }
+                    }
+                }
             },
             TraitItem::Type(data) => {
                 let ident = &data.ident;
-                impl_items.extend(quote!{
+                quote!{
                     default type #ident = <#struct_ident as #trait_ident>:: #ident;
-                });
+                }
             },
             TraitItem::Const(data) => {
                 let ident = &data.ident;
                 let type_name = &data.ty;
-                impl_items.extend(quote!{
+                quote!{
                     default const #ident : #type_name = <#struct_ident as #trait_ident>:: #ident;
-                });
+                }
             },
             TraitItem::Macro(_data) => panic!("macros in trait declarations are not supported"),
             TraitItem::Verbatim(_data) => panic!("verbatim tokens in trait declarations are not supported")
         }
-    }
+    } ).collect::<TokenStream2>();
 
     quote!{
         impl <T> #trait_ident for T 

@@ -2,7 +2,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use proc_macro2::{Ident,Span};
 
 use syn::{ItemStruct};
-use crate::MAX_CONSTRAITS;
+use crate::common::*;
 
 pub(crate) fn expand(item: ItemStruct) -> TokenStream2 {
     use syn::Fields::*;
@@ -19,12 +19,11 @@ pub(crate) fn expand(item: ItemStruct) -> TokenStream2 {
     }
     let field = super_fields.into_iter().next().unwrap();
 
-    let mut constrait_ts = TokenStream2::new();
-    for i in 0..MAX_CONSTRAITS {
+    let constrait_ts = (0..MAX_CONSTRAITS).into_iter().map( |i| {
         let ident_prev = Ident::new(&format!("Constrait{}", i), Span::call_site());
         let ident = Ident::new(&format!("Constrait{}", i + 1), Span::call_site());
-        constrait_ts.extend(quote!{ type #ident = <Self::#ident_prev as ::impl_inheritance::SuperType>::SupType;});
-    }
+        quote!{ type #ident = <Self::#ident_prev as ::impl_inheritance::SuperType>::SupType;}
+    }).collect::<TokenStream2>();
 
     let struct_ident = &item.ident;
     let field_ident = &field.ident;

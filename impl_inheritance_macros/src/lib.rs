@@ -6,6 +6,7 @@ mod expand_inherites;
 mod expand_base; 
 mod expand_override;
 mod expand_constraits;
+pub (crate) mod common;
 
 #[macro_use]
 extern crate syn;
@@ -13,7 +14,7 @@ extern crate syn;
 #[macro_use]
 extern crate quote;
 
- use syn::{ItemTrait,ItemStruct,punctuated::Punctuated,FnArg,token::Comma,ItemImpl};
+ use syn::{ItemTrait,ItemStruct,ItemImpl};
 
  use proc_macro::TokenStream;
 
@@ -56,9 +57,6 @@ pub fn base(input: TokenStream) -> TokenStream {
     expanded
 }
 
-
-pub (crate) static  MAX_CONSTRAITS : u8 = 10;
-
 #[proc_macro]
 pub fn expand_constraits_def(_in: TokenStream) -> TokenStream {
     let result = expand_constraits::expand();
@@ -67,21 +65,3 @@ pub fn expand_constraits_def(_in: TokenStream) -> TokenStream {
 }
 
 
-///changes list of fn arguments from form of declaration to form of invocation
-pub(crate) fn unpack_fn_arg( input: &Punctuated<FnArg, Comma>) -> Punctuated<FnArg, Comma> {
-    use FnArg::*;
-    input.iter()
-    .map(|x| match x {
-        SelfRef(arg) => {
-            let arg = arg.clone();
-            SelfValue(syn::ArgSelf{mutability: arg.mutability, self_token: arg.self_token})
-        },
-        Captured(arg) => {
-            let arg = arg.clone();
-            Inferred(arg.pat)
-            
-        }
-        _ => x.clone()
-    })
-    .collect()
-}

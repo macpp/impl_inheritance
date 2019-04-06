@@ -1,14 +1,13 @@
 
 use proc_macro2::TokenStream as TokenStream2;
 use proc_macro2::{Ident,Span};
-use crate::MAX_CONSTRAITS;
+use crate::common::*;
 
 pub(crate)fn expand() -> TokenStream2 {
-    let mut ts = TokenStream2::new();
-    for i in 0..=MAX_CONSTRAITS {
+    let ts = (0..=MAX_CONSTRAITS).into_iter().map(|i| {
         let ident = Ident::new(&format!("Constrait{}",i), Span::call_site());
-        ts.extend(quote!{type #ident ;})
-    }
+        quote!{type #ident ;}
+    }).collect::<TokenStream2>();
 
     quote!{
         #[doc(hidden)]
