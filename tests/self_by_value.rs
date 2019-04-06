@@ -15,7 +15,7 @@ fn self_by_value() {
 #[test]
 
 fn struct_with_drop() {
-    
+
 }
 
 #[macro_use]
@@ -28,7 +28,7 @@ trait Base {
     fn foo(self) -> i32;
 }
 
-#[derive(Default,Debug,Base)]
+#[derive(Default,Debug,Base,Clone)]
 struct BaseData {
     x: i32
 }
@@ -49,8 +49,14 @@ trait Child1 : Base {
 #[derive(Default,Debug,Inherites)]
 struct Child1Data {
     x1 : i32,
-    #[super_data]
+    #[super_data(clone)]
     super_data: BaseData,
+}
+
+impl std::ops::Drop for Child1Data {
+    fn drop(&mut self) {
+
+    }
 }
 
 impl Child1 for Child1Data {

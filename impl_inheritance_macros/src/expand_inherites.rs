@@ -21,7 +21,6 @@ pub(crate) fn expand(item: ItemStruct) -> TokenStream2 {
     let attr = field.attrs.iter().filter(|x| x.path.is_ident("super_data"))
     .next().unwrap().clone();
 
-
     let constrait_ts = (0..MAX_CONSTRAITS).into_iter().map( |i| {
         let ident_prev = Ident::new(&format!("Constrait{}", i), Span::call_site());
         let ident = Ident::new(&format!("Constrait{}", i + 1), Span::call_site());
@@ -32,7 +31,12 @@ pub(crate) fn expand(item: ItemStruct) -> TokenStream2 {
     let field_ident = &field.ident;
     let field_type = &field.ty;
 
-    let self_decompose = quote!{ self.#field_ident};
+    let self_decompose = match attr.tts.to_string().trim() {
+        "" => quote!{ self.#field_ident},
+        //TODO: better implementation of parsing, other options (swap with default/unimplemented)
+        "( clone )" => quote!{self.#field_ident.clone()},
+        _ => panic!("unsupported #[super_data] value {}", attr.tts.to_string().trim()),
+    };
 
     quote!{
         impl ::impl_inheritance::SuperBorrow<#field_type> for #struct_ident
