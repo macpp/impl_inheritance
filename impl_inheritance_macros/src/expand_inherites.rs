@@ -18,6 +18,9 @@ pub(crate) fn expand(item: ItemStruct) -> TokenStream2 {
         panic!("exacly one field must be marker with #[super_data] attribute");
     }
     let field = super_fields.into_iter().next().unwrap();
+    let attr = field.attrs.iter().filter(|x| x.path.is_ident("super_data"))
+    .next().unwrap().clone();
+
 
     let constrait_ts = (0..MAX_CONSTRAITS).into_iter().map( |i| {
         let ident_prev = Ident::new(&format!("Constrait{}", i), Span::call_site());
@@ -29,6 +32,8 @@ pub(crate) fn expand(item: ItemStruct) -> TokenStream2 {
     let field_ident = &field.ident;
     let field_type = &field.ty;
 
+    let self_decompose = quote!{ self.#field_ident};
+
     quote!{
         impl ::impl_inheritance::SuperBorrow<#field_type> for #struct_ident
         {
@@ -39,11 +44,14 @@ pub(crate) fn expand(item: ItemStruct) -> TokenStream2 {
             fn super_ref_mut(& mut self) -> & mut #field_type {
                 & mut self.#field_ident
             }
+            fn super_value(self) -> #field_type{
+                #self_decompose
+            }
         }
 
         impl<T> ::impl_inheritance::SuperBorrow<T> for #struct_ident
         where T : ::impl_inheritance::IsSuperBorrowableTo<#field_type> ,
-        T: ? Sized
+        T:  Sized
         {
             fn super_ref(&self) -> & T {
                 ::impl_inheritance::IsSuperBorrowableTo::get_part(&self.#field_ident)
@@ -51,6 +59,10 @@ pub(crate) fn expand(item: ItemStruct) -> TokenStream2 {
 
             fn super_ref_mut(& mut self) -> & mut T {
                 ::impl_inheritance::IsSuperBorrowableTo::get_part_mut(& mut self.#field_ident)
+            }
+
+            fn super_value(self) -> T {
+                ::impl_inheritance::IsSuperBorrowableTo::get_part_value(#self_decompose)
             }
         }
 

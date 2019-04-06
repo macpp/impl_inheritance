@@ -25,7 +25,7 @@ pub static  MAX_CONSTRAITS : u8 = 10;
 pub fn get_super_method(x : Option<&FnArg>) -> Option<(Ident,TokenStream2)> {
     use syn::FnArg::*;
     match x{
-        None => None,//panic!("trait with no methods are not supported"),
+        None => None,
         Some(SelfRef(x)) => {
                 if x.mutability.is_some() 
                 {
@@ -37,8 +37,8 @@ pub fn get_super_method(x : Option<&FnArg>) -> Option<(Ident,TokenStream2)> {
                 }
             },
         Some(SelfValue(_x)) => {
-                panic!("methods with `self` by value are not yet supported")
-                //Some((Ident::new("super_value", Span::call_site()), quote!{}))
+                //panic!("methods with `self` by value are not yet supported")
+                Some((Ident::new("super_value", Span::call_site()), quote!{}))
         },
         Some(Captured(_x)) => None,
         _ => panic!("some of the fn arguments are not supported!")

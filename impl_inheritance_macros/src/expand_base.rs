@@ -19,6 +19,9 @@ pub(crate) fn expand(item: ItemStruct) -> TokenStream2 {
             fn super_ref_mut(& mut self) -> & mut ::impl_inheritance::Placeholder {
                 unimplemented!()
             }
+            fn super_value(self) -> ::impl_inheritance::Placeholder {
+                unimplemented!()
+            }
         }
     }
 }
