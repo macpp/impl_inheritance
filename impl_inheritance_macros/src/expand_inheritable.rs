@@ -21,23 +21,15 @@ pub(crate)fn expand(trait_item: ItemTrait, struct_ident: Ident) -> TokenStream2 
     //TODO: generate documentation
 
     let trait_ident = &trait_item.ident;
-
-    let parent_trait_constraint = {
-        let supertr = trait_item.supertraits.iter()
-        .map(|x| x.clone())
-        .collect::<Vec<_>>();
-        match supertr.len() {
-            0 => quote!{},
-            1 => {
-                let ident = match &supertr[0] {
+    let parent_trait_constraint = trait_item.supertraits.iter()
+    .map(|x| {
+        let ident = match x {
                     syn::TypeParamBound::Trait(t) => &t.path,
                     syn::TypeParamBound::Lifetime(_l) => panic!("lifetime bounds in trait inheritance not supported")
-                };
-                quote!{ T : #ident,}
-            },
-            _ =>  panic!("traits with more than one supertrait are not supported")
-        }
-    };
+            };
+            quote!{ T : #ident,}
+    })
+    .collect::<TokenStream2>();
     
     let impl_items = trait_item.items.iter(). map( |item| {
         use syn::TraitItem;
@@ -89,13 +81,23 @@ pub(crate)fn expand(trait_item: ItemTrait, struct_ident: Ident) -> TokenStream2 
         }
     } ).collect::<TokenStream2>();
 
+    let stub_ident = get_stub_ident(trait_ident);
+    let supertraits = &trait_item.supertraits;
+
     quote!{
         impl <T> #trait_ident for T 
         where T : ::impl_inheritance::SuperBorrow<#struct_ident>, 
-        #parent_trait_constraint
+        T : #stub_ident
         {
             #impl_items
         }
+
+        #[doc(hidden)]
+        trait #stub_ident : #supertraits {}
+
+        impl <T> #stub_ident for T 
+        where 
+        #parent_trait_constraint {}
     }
 }
 

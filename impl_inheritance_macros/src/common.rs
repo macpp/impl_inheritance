@@ -1,4 +1,4 @@
- use syn::{punctuated::Punctuated,FnArg,token::Comma,Ident};
+ use syn::{punctuated::Punctuated,FnArg,token::Comma,Ident,Path};
 use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
 ///changes list of fn arguments from form of declaration to form of invocation
@@ -43,4 +43,19 @@ pub fn get_super_method(x : Option<&FnArg>) -> Option<(Ident,TokenStream2)> {
         Some(Captured(_x)) => None,
         _ => panic!("some of the fn arguments are not supported!")
     }
+}
+
+pub fn get_stub_path(mut input : Path) -> Path {
+    match input.segments.last_mut(){
+        Some(mut x) => {
+            let seg = x.value_mut();
+            seg.ident = get_stub_ident(&seg.ident);
+        }
+        _ => {}
+    }
+    input
+}
+
+pub fn get_stub_ident(input: &Ident) -> Ident {
+    Ident::new(&format!("{}___Stub", input), Span::call_site())
 }

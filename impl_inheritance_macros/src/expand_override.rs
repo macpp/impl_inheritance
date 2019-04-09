@@ -70,9 +70,12 @@ pub(crate)fn expand(trait_impl: ItemImpl) -> TokenStream2 {
         }
     }).collect::<TokenStream2>();
 
+    let stub_ident = get_stub_path(trait_ident.clone());
+
     quote!{
         impl <T> #trait_ident for T
         where
+        T: #stub_ident,
         #con_ts
         {
             #impl_items
