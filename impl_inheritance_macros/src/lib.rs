@@ -19,7 +19,7 @@ extern crate quote;
  use proc_macro::TokenStream;
 
 #[proc_macro_attribute]
-pub fn inheritable(attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn inheritable_for(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut out  = input.clone();
     let item = parse_macro_input!(input as ItemTrait);
 
@@ -41,7 +41,7 @@ pub fn overrides(_attr: TokenStream, input: TokenStream) -> TokenStream {
     out 
 }
 
-#[proc_macro_derive(Inherites, attributes(super_data))]
+#[proc_macro_derive(InheritesImpls, attributes(super_data))]
 pub fn inherites(input: TokenStream) -> TokenStream {
     let item = parse_macro_input!(input as ItemStruct);
     let expanded : TokenStream =expand_inherites::expand(item).into();
@@ -49,7 +49,7 @@ pub fn inherites(input: TokenStream) -> TokenStream {
     expanded
 }
 
-#[proc_macro_derive(Base, attributes(super_data))]
+#[proc_macro_derive(Base)]
 pub fn base(input: TokenStream) -> TokenStream {
     let item = parse_macro_input!(input as ItemStruct);
     let expanded : TokenStream =expand_base::expand(item).into();
@@ -57,8 +57,9 @@ pub fn base(input: TokenStream) -> TokenStream {
     expanded
 }
 
+#[doc(hidden)]
 #[proc_macro]
-pub fn expand_constraits_def(_in: TokenStream) -> TokenStream {
+pub fn __impl_inheritance_private_expand_constraits_def(_in: TokenStream) -> TokenStream {
     let result = expand_constraits::expand();
     //println!("EXPANDED: {}", result.to_string());
     result.into()

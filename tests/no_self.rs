@@ -23,7 +23,7 @@ fn child2(){
 
 //--level_0--
 
-#[inheritable(BaseData)]
+#[inheritable_for(BaseData)]
 trait Base {
     fn foo() -> i32;
 }
@@ -41,12 +41,12 @@ impl Base for BaseData {
 
 //--level_1--
 
-#[inheritable(Child1Data)]
+#[inheritable_for(Child1Data)]
 trait Child1 : Base {
     fn foo1(a : i32) -> i32;
 }
 
-#[derive(Default,Debug,Inherites)]
+#[derive(Default,Debug,InheritesImpls)]
 struct Child1Data {
     x1 : i32,
     #[super_data]
@@ -68,13 +68,13 @@ impl Base for Child1Data {
 
 //--level_2--
 
-#[inheritable(Child2Data)]
+#[inheritable_for(Child2Data)]
 trait Child2 : Child1 {
     fn foo2(b: i32) -> i32;
 }
 
 
-#[derive(Default,Debug,Inherites)]
+#[derive(Default,Debug,InheritesImpls)]
 struct Child2Data {
     x2 : i32,
     #[super_data]

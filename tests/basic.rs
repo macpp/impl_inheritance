@@ -60,7 +60,7 @@ fn child5(){
 
 //--level_0--
 
-#[inheritable(BaseData)]
+#[inheritable_for(BaseData)]
 trait Base {
     fn foo(&self) -> i32;
 }
@@ -78,12 +78,12 @@ impl Base for BaseData {
 
 //--level_1--
 
-#[inheritable(Child1Data)]
+#[inheritable_for(Child1Data)]
 trait Child1 : Base {
     fn foo1(&self);
 }
 
-#[derive(Default,Debug,Inherites)]
+#[derive(Default,Debug,InheritesImpls)]
 struct Child1Data {
     x1 : i32,
     #[super_data]
@@ -98,13 +98,13 @@ impl Child1 for Child1Data {
 
 //--level_2--
 
-#[inheritable(Child2Data)]
+#[inheritable_for(Child2Data)]
 trait Child2 : Child1 {
     fn foo2(&self) -> i32;
 }
 
 
-#[derive(Default,Debug,Inherites)]
+#[derive(Default,Debug,InheritesImpls)]
 struct Child2Data {
     x2 : i32,
     #[super_data]
@@ -130,12 +130,12 @@ impl Base for Child2Data {
 //--level_3--
 
 //a 
-#[inheritable(Child3aData)]
+#[inheritable_for(Child3aData)]
 trait Child3a : Child2 {
     fn foo3a(&self);
 }
 
-#[derive(Default,Debug,Inherites)]
+#[derive(Default,Debug,InheritesImpls)]
 struct Child3aData {
     x3 : i32,
     #[super_data]
@@ -151,12 +151,12 @@ impl Child3a for Child3aData {
 
 //b
 
-#[inheritable(Child3bData)]
+#[inheritable_for(Child3bData)]
 trait Child3b : Child2 {
     fn foo3b(&self);
 }
 
-#[derive(Default,Debug,Inherites)]
+#[derive(Default,Debug,InheritesImpls)]
 struct Child3bData {
     x3 : i32,
     #[super_data]
@@ -179,12 +179,12 @@ impl Child2 for Child3bData {
 //--level_4--
 
 
-#[inheritable(Child4Data)]
+#[inheritable_for(Child4Data)]
 trait Child4 : Child3b {
     fn foo4(& mut self) -> i32;
 }
 
-#[derive(Default,Debug,Inherites)]
+#[derive(Default,Debug,InheritesImpls)]
 struct Child4Data {
     x4 : i32,
     #[super_data]
@@ -209,12 +209,12 @@ impl Base for Child4Data {
 //level_5--
 
 
-#[inheritable(Child5Data)]
+#[inheritable_for(Child5Data)]
 trait Child5 : Child4 {
     fn foo5(& mut self);
 }
 
-#[derive(Default,Debug,Inherites)]
+#[derive(Default,Debug,InheritesImpls)]
 struct Child5Data {
     x5 : i32,
     #[super_data]

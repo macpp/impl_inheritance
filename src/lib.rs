@@ -42,5 +42,5 @@ impl SuperType for Placeholder {
     type SupType = Placeholder;
 }
 
-expand_constraits_def!();
+__impl_inheritance_private_expand_constraits_def!();
 
